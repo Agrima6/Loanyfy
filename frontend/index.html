@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Loanyfy – Smart Lending</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- GSAP Animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+
+<body>
+  <!-- Animated Background Blobs -->
+  <div class="bg-blobs">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <!-- Top Brand Bar -->
+  <header class="top-bar">
+    <div class="brand">
+    
+      <div>
+        <div class="brand-logo-text">
+          <span class="l1">Loan</span><span class="l2">yfy</span>
+        </div>
+        <div class="brand-tagline">Loan - Yes For You</div>
+      </div>
+    </div>
+
+    <div class="lang-pill">
+      <span>EN</span>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-wrap">
+    <section class="card" id="wizardCard">
+
+      <!-- Progress Bar -->
+      <div class="progress">
+        <div class="progress-top">
+          <span id="stepTitle">Step 1 of 4 – Welcome</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <!-- STEP 1 -->
+      <section class="step step-active" data-step="1">
+        <div class="step-header">
+          <div class="step-header-text">
+           
+            <h1 class="step-heading">Welcome to Loanyfy</h1>
+            <p class="step-subtitle">
+              Start your business loan journey in just a few steps.
+            </p>
+          </div>
+          <div class="step-header-visual">
+            <img src="assets/mm.png" alt="Welcome to Loanyfy">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" placeholder="Enter your full name" />
+        </div>
+
+        <div class="field-group">
+          <label for="mobile">Mobile Number</label>
+          <input type="tel" id="mobile" placeholder="Enter your 10-digit mobile number" />
+        </div>
+
+        <div class="field-group">
+          <label for="email">Email ID</label>
+          <input type="email" id="email" placeholder="Enter your email address" />
+        </div>
+
+        <div class="field-group">
+          <label for="panNumber">PAN Card Number</label>
+          <input type="text" id="panNumber" placeholder="Enter your PAN (e.g. ABCDE1234F)" />
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="termsCheckbox" />
+          <span>I agree to the <a href="#">Terms &amp; Conditions</a></span>
+        </label>
+
+        <button class="primary-btn" id="toStep2Btn">
+          Continue <span class="btn-arrow">→</span>
+        </button>
+
+        <p class="support-text">
+          Need help? <a href="#">Contact support</a>
+        </p>
+
+        <p class="security-text">
+          🔒 Your data is secure and encrypted.
+        </p>
+      </section>
+
+      <!-- STEP 2 -->
+      <section class="step" data-step="2">
+        <div class="step-header">
+          <div class="step-header-text">
+            
+            <h1 class="step-heading">Business Details</h1>
+            <p class="step-subtitle">Tell us more about your business.</p>
+          </div>
+          <div class="step-header-visual">
+            <img src="assets/hnd.png" alt="Business details illustration">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label>Trade Name *</label>
+          <input id="tradeName" placeholder="Enter your business name" />
+        </div>
+
+        <div class="field-group">
+          <label>Vintage (Years in Business) *</label>
+          <select id="vintage">
+            <option value="">Select business vintage</option>
+            <option value="0-1 years">0 – 1 year</option>
+            <option value="1-3 years">1 – 3 years</option>
+            <option value="3-5 years">3 – 5 years</option>
+            <option value="5+ years">5+ years</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label>Business Address *</label>
+          <textarea id="address" rows="2" placeholder="Enter complete business address"></textarea>
+        </div>
+
+        <div class="field-row-3">
+          <div class="field-group">
+            <label>Pincode *</label>
+            <input id="pincode" placeholder="110011" />
+          </div>
+
+          <div class="field-group">
+            <label>City *</label>
+            <input id="city" placeholder="DELHI" />
+          </div>
+
+          <div class="field-group">
+            <label>State *</label>
+            <input id="state" placeholder="DL" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label>Constitution Type *</label>
+          <select id="constitutionType">
+            <option value="">Select constitution</option>
+            <option value="Proprietorship">Proprietorship</option>
+            <option value="Partnership">Partnership</option>
+            <option value="Private Limited">Private Limited</option>
+            <option value="Public Limited">Public Limited</option>
+            <option value="LLP">LLP</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label>Annual Turnover *</label>
+          <select id="annualTurnover">
+            <option value="">Select annual turnover range</option>
+            <option value="<25L">&lt; 25 Lakhs</option>
+            <option value="25L-1Cr">25 Lakhs – 1 Cr</option>
+            <option value="1Cr-5Cr">1 Cr – 5 Cr</option>
+            <option value="5Cr+">5 Cr+</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label>Monthly Obligations (Existing EMIs / Credit Card dues)</label>
+          <input
+            type="number"
+            id="monthlyObligation"
+            placeholder="Total monthly obligations in ₹"
+            min="0"
+          />
+        </div>
+
+        <div class="field-group">
+          <label>Industry Type *</label>
+          <select id="industryType">
+            <option value="">Select your industry</option>
+            <option value="Retail">Retail</option>
+            <option value="Manufacturing">Manufacturing</option>
+            <option value="Services">Services</option>
+            <option value="FMCG">FMCG</option>
+            <option value="Others">Others</option>
+          </select>
+        </div>
+
+        <div class="step-actions">
+          <button class="ghost-btn" id="backTo1">← Back</button>
+          <button class="primary-btn" id="toStep3Btn">
+            Continue <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="step" data-step="3">
+        <div class="step-header">
+          <div class="step-header-text">
+           
+            <h1 class="step-heading">Your Loan Offer</h1>
+            <p class="step-subtitle">
+              Based on your details, here’s an indicative offer.
+            </p>
+          </div>
+          <div class="step-header-visual">
+            <img src="assets/uu.png" alt="Loan offer illustration">
+          </div>
+        </div>
+
+        <div class="two-column">
+          <div class="offer-card glass">
+            <div class="pill pill-success">Pre-Approved*</div>
+            <h2 class="offer-title">Maximum Loan Eligible Upto</h2>
+            <div class="offer-amount" id="maxLoanAmount">₹ 1 Cr</div>
+
+            <div class="offer-meta">
+              <div>
+                <span class="meta-label">Interest Rate</span>
+                <span class="meta-value" id="interestRateLabel">16.99% p.a.</span>
+              </div>
+              <div>
+                <span class="meta-label">Max Tenure</span>
+                <span class="meta-value">36 Months</span>
+              </div>
+            </div>
+
+            <div class="docs-block">
+              <h3>Documentation Required</h3>
+              <ul>
+                <li>PAN Card</li>
+                <li>Aadhaar Card</li>
+                <li>Bank Statements (last 6 months)</li>
+                <li>Business Registration Certificate</li>
+                <li>GST Certificate (if applicable)</li>
+              </ul>
+              <p class="docs-note">You’ll be able to upload these later.</p>
+            </div>
+          </div>
+
+          <div class="calculator-card glass">
+            <h2 class="calculator-title">EMI Calculator</h2>
+
+            <div class="field-group">
+              <label>Loan Amount</label>
+              <div class="range-row">
+                <input type="range" id="loanAmountRange" min="50000" max="1000000" step="5000" />
+                <span id="loanAmountLabel" class="range-value">₹ 500K</span>
+              </div>
+
+              <div class="inline-inputs">
+                <span>₹50K</span>
+                <input type="number" id="loanAmountInput" />
+                <span>₹10L</span>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label>Tenure (Months)</label>
+              <div class="range-row">
+                <input type="range" id="tenureRange" min="6" max="60" step="1" />
+                <span id="tenureLabel" class="range-value">12 months</span>
+              </div>
+
+              <div class="inline-inputs">
+                <span>6</span>
+                <input type="number" id="tenureInput" />
+                <span>60</span>
+              </div>
+            </div>
+
+            <div class="emi-result">
+              <div class="emi-main">
+                <span>Your Monthly EMI</span>
+                <div class="emi-value" id="emiValue">₹ 0</div>
+              </div>
+
+              <div class="emi-meta">
+                <div>
+                  <span class="meta-label">Total Interest</span>
+                  <span class="meta-value" id="totalInterestValue">₹ 0</span>
+                </div>
+                <div>
+                  <span class="meta-label">Total Amount</span>
+                  <span class="meta-value" id="totalAmountValue">₹ 0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="small-note">*Final approval subject to verification.</p>
+
+        <div class="step-actions step-actions-multi">
+          <button class="ghost-btn" id="backTo2">← Back</button>
+
+          <div class="process-actions">
+            <span class="process-label">Process for:</span>
+            <div class="process-buttons">
+              <button class="primary-btn" id="processOverdraftBtn">
+                Overdraft Limit
+              </button>
+              <button class="primary-btn secondary-as-primary" id="processTermLoanBtn">
+                Term Loan
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 4 -->
+      <section class="step" data-step="4">
+        <div class="confetti confetti-1"></div>
+        <div class="confetti confetti-2"></div>
+        <div class="confetti confetti-3"></div>
+
+        <div class="step-icon-circle"><span>🤝</span></div>
+
+        <h1 class="step-heading">
+          Thank You, <span id="thankYouName"></span>!
+        </h1>
+
+        <p class="step-subtitle step-subtitle-strong">
+          Our Loanyfy expert team is now reviewing your details.
+          <br />
+          <strong>You’ll receive a call shortly on your registered mobile number.</strong>
+        </p>
+
+        <div class="summary-card glass">
+          <h3>Keep these documents handy for faster approval:</h3>
+          <ul class="docs-list-highlight">
+            <li>✅ PAN Card</li>
+            <li>✅ Aadhaar Card</li>
+            <li>✅ Last 6 months Bank Statements</li>
+            <li>✅ Business Registration / GST Certificate (if applicable)</li>
+          </ul>
+
+          <p class="summary-note">
+            During the call, our experts will guide you on document upload,
+            explain the final EMI &amp; tenure, and complete the journey end-to-end.
+          </p>
+        </div>
+
+        <div class="trust-points-elevated glass-soft">
+          <h3>Why you can trust Loanyfy</h3>
+          <ul>
+            <li>Safe &amp; 100% Secure Documents</li>
+            <li>0% Hassle.</li>
+            <li>Your Data, Fully Protected.</li>
+            <li>Simple Document Upload.</li>
+            <li>No Hidden Fees. No Hidden Risks.</li>
+          </ul>
+        </div>
+
+        <div class="upload-card glass">
+          <div class="upload-header-row">
+            <div>
+              <h3>Upload your documents now</h3>
+              <p class="upload-subtext">
+                Upload securely so our experts can fast-track your approval.
+              </p>
+            </div>
+            <div class="upload-visual">
+              <img src="assets/ag.png" alt="Secure upload">
+            </div>
+          </div>
+
+          <div class="upload-grid">
+            <div class="upload-field">
+              <label>PAN Card</label>
+              <input type="file" id="docPan" accept="image/*,application/pdf" />
+            </div>
+
+            <div class="upload-field">
+              <label>Aadhaar Card</label>
+              <input type="file" id="docAadhaar" accept="image/*,application/pdf" />
+            </div>
+
+            <div class="upload-field">
+              <label>Business Registration Certificate / GST</label>
+              <input type="file" id="docBusinessReg" accept="image/*,application/pdf" />
+            </div>
+
+            <div class="upload-field">
+              <label>Electricity Bill</label>
+              <input type="file" id="docElectricityBill" accept="image/*,application/pdf" />
+            </div>
+
+            <div class="upload-field upload-field-wide">
+              <label>Bank Statements (last 6 months)</label>
+              <input type="file" id="docBankStatements" multiple
+                     accept="image/*,application/pdf" />
+            </div>
+          </div>
+
+          <p class="upload-note">
+            All documents are encrypted and stored securely. Our experts will never
+            share your data without consent.
+          </p>
+
+          <button class="primary-btn" id="submitDocsBtn">
+            Upload Documents Securely
+          </button>
+        </div>
+
+        <!-- Partners marquee ONLY on last page -->
+        <section class="partners-section">
+  <h2 class="partners-heading">Our Business Loan Partners</h2>
+
+  <div class="partners-marquee-wrapper">
+    <!-- ROW 1 -->
+    <div class="partners-marquee-row partners-row-1">
+      <!-- Track 1 -->
+      <div class="partners-track">
+        <div class="partner-logo"><img src="assets/partners/100.svg" alt="Kotak" /></div>
+        <div class="partner-logo"><img src="assets/partners/wee.png" alt="HDFC Bank" /></div>
+        <div class="partner-logo"><img src="assets/partners/102.png" alt="ICICI Bank" /></div>
+        <div class="partner-logo"><img src="assets/partners/103.png" alt="Axis Bank" /></div>
+        <div class="partner-logo"><img src="assets/partners/104.png" alt="SBI" /></div>
+        <div class="partner-logo"><img src="assets/partners/105.svg" alt="NeoGrowth" /></div>
+        <div class="partner-logo"><img src="assets/partners/106.png" alt="Fullerton" /></div>
+        <div class="partner-logo"><img src="assets/partners/107.png" alt="Bajaj Finserv" /></div>
+        <div class="partner-logo"><img src="assets/partners/8.png"   alt="KreditBee" /></div>
+      </div>
+
+      <!-- Track 2 (duplicate for seamless loop) -->
+      <div class="partners-track">
+        <div class="partner-logo"><img src="assets/partners/100.svg" alt="Kotak" /></div>
+        <div class="partner-logo"><img src="assets/partners/wee.png" alt="HDFC Bank" /></div>
+        <div class="partner-logo"><img src="assets/partners/102.png" alt="ICICI Bank" /></div>
+        <div class="partner-logo"><img src="assets/partners/103.png" alt="Axis Bank" /></div>
+        <div class="partner-logo"><img src="assets/partners/104.png" alt="SBI" /></div>
+        <div class="partner-logo"><img src="assets/partners/105.svg" alt="NeoGrowth" /></div>
+        <div class="partner-logo"><img src="assets/partners/106.png" alt="Fullerton" /></div>
+        <div class="partner-logo"><img src="assets/partners/107.png" alt="Bajaj Finserv" /></div>
+        <div class="partner-logo"><img src="assets/partners/8.png"   alt="KreditBee" /></div>
+      </div>
+    </div>
+
+    <!-- ROW 2 -->
+    <div class="partners-marquee-row partners-row-2">
+      <!-- Track 1 -->
+      <div class="partners-track">
+        <div class="partner-logo"><img src="assets/partners/101.png" alt="FlexiLoans" /></div>
+        <div class="partner-logo"><img src="assets/partners/102.png" alt="Tata Capital" /></div>
+        <div class="partner-logo"><img src="assets/partners/100.svg" alt="Poonawalla Fincorp" /></div>
+        <div class="partner-logo"><img src="assets/partners/103.png" alt="SBM Bank" /></div>
+        <div class="partner-logo"><img src="assets/partners/104.png" alt="Standard Chartered" /></div>
+        <div class="partner-logo"><img src="assets/partners/105.svg" alt="IIFL" /></div>
+        <div class="partner-logo"><img src="assets/partners/106.png" alt="Edelweiss" /></div>
+        <div class="partner-logo"><img src="assets/partners/107.png" alt="MAS Finance" /></div>
+        <div class="partner-logo"><img src="assets/partners/109.png" alt="Muthoot Finance" /></div>
+      </div>
+
+      <!-- Track 2 (duplicate) -->
+      <div class="partners-track">
+        <div class="partner-logo"><img src="assets/partners/101.png" alt="FlexiLoans" /></div>
+        <div class="partner-logo"><img src="assets/partners/102.png" alt="Tata Capital" /></div>
+        <div class="partner-logo"><img src="assets/partners/100.svg" alt="Poonawalla Fincorp" /></div>
+        <div class="partner-logo"><img src="assets/partners/103.png" alt="SBM Bank" /></div>
+        <div class="partner-logo"><img src="assets/partners/104.png" alt="Standard Chartered" /></div>
+        <div class="partner-logo"><img src="assets/partners/105.svg" alt="IIFL" /></div>
+        <div class="partner-logo"><img src="assets/partners/106.png" alt="Edelweiss" /></div>
+        <div class="partner-logo"><img src="assets/partners/107.png" alt="MAS Finance" /></div>
+        <div class="partner-logo"><img src="assets/partners/109.png" alt="Muthoot Finance" /></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+        <button class="ghost-btn start-again-btn" id="startAgainBtn">
+          Start New Application
+        </button>
+      </section>
+    </section>
+  </main>
+
+  <!-- API URL -->
+  <script>
+    window.LOANYFY_API_BASE = "http://localhost:5001";
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>
