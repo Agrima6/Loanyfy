@@ -10,10 +10,25 @@ const fs = require("fs");
 const app = express();
 
 // ---------- MIDDLEWARE ----------
-app.use(cors());
+
+// CORS: allow all in dev, restrict to Netlify in prod
+if (process.env.NODE_ENV === "production") {
+  app.use(
+    cors({
+      origin: [
+        "https://loanyfy.netlify.app", // 👉 replace with your actual Netlify URL if different
+      ],
+      methods: ["GET", "POST"],
+    })
+  );
+} else {
+  // local testing (Postman / localhost)
+  app.use(cors());
+}
+
 app.use(express.json());
 
-// (optional) serve uploaded files statically if you ever need previews
+// serve uploaded files statically (if you ever need previews)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ---------- MONGO CONNECTION ----------
@@ -32,11 +47,10 @@ const applicationSchema = new mongoose.Schema(
     fullName: { type: String, required: true },
     mobile: { type: String, required: true },
 
-    // now actually used
     email: String,
     panNumber: String,
 
-    // optional extra fields you may add later
+    // optional extra fields
     altMobile: String,
     dob: String,
     aadhaarNumber: String,
@@ -56,7 +70,6 @@ const applicationSchema = new mongoose.Schema(
       annualTurnover: String,
       industryType: String,
 
-      // new field
       monthlyObligation: Number, // total monthly EMIs / CC etc.
 
       // optional future fields
@@ -115,6 +128,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // ---------- ROUTES ----------
+
+// simple health route
 app.get("/", (req, res) => {
   res.send("Loanyfy API is running 🚀");
 });
@@ -191,20 +206,24 @@ app.post(
           : undefined,
       };
 
-      // remove undefined keys so we don't overwrite existing docs with undefined
-      Object.keys(docsUpdate).forEach(
-        (k) => docsUpdate[k] === undefined && delete docsUpdate[k]
-      );
+      // build $set with dotted paths so we don't overwrite whole documents object
+      const setOps = {};
+      Object.entries(docsUpdate).forEach(([key, value]) => {
+        if (value !== undefined) {
+          setOps[`documents.${key}`] = value;
+        }
+      });
+
+      if (!Object.keys(setOps).length) {
+        return res.status(400).json({
+          success: false,
+          message: "No documents received to upload",
+        });
+      }
 
       const updated = await Application.findByIdAndUpdate(
         applicationId,
-        {
-          $set: {
-            ...(Object.keys(docsUpdate).length
-              ? { documents: docsUpdate }
-              : {}),
-          },
-        },
+        { $set: setOps },
         { new: true }
       );
 
@@ -230,7 +249,7 @@ app.post(
 );
 
 // ---------- START SERVER ----------
-const PORT = process.env.PORT || 5001; // match frontend base URL
-app.listen(PORT, () =>
-  console.log(`Server running on port ${PORT} ✅`)
-);
+const PORT = process.env.PORT || 5001; // Render sets PORT in prod
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} ✅`);
+});
