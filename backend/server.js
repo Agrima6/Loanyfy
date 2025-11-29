@@ -16,7 +16,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(
     cors({
       origin: [
-        "https://loanyfy.netlify.app", // 👉 replace with your actual Netlify URL if different
+        "https://effervescent-baklava-9c7280.netlify.app", // 👉 replace with your actual Netlify URL if different
       ],
       methods: ["GET", "POST"],
     })
