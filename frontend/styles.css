@@ -172,14 +172,35 @@ body {
 /* Loanyfy Text Logo – NO GAP between Loan + yfy */
 /* Loanyfy Text Logo – NO GAP and .com in purple */
 .brand-logo-text {
-  font-family: "Georgia", "Times New Roman", serif;
+  font-family: Georgia, "Times New Roman", serif;
   font-weight: 700;
-  font-size: 34px;
-  letter-spacing: 0.02em;          /* tiny breathing space */
+  font-size: 36px;
   display: inline-flex;
-  align-items: baseline;
-  position: relative;
+  align-items: center;
+  letter-spacing: 0;        /* 💯 No spacing between letters */
 }
+
+.brand-logo-text span {
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+}
+
+/* Loan (Purple) */
+.txt-loan {
+  color: #7b2ff7;           /* Your purple */
+}
+
+/* yfy (Black) */
+.txt-yfy {
+  color: #1a1a1a;
+}
+
+/* .com (Purple) */
+.txt-com {
+  color: #7b2ff7;
+}
+
 
 .brand-logo-text span {
   display: inline-block;
