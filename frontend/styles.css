@@ -174,7 +174,7 @@ body {
 .brand-logo-text {
   font-family: Georgia, "Times New Roman", serif;
   font-weight: 700;
-  font-size: 36px;
+  font-size: 30px;
   display: inline-flex;
   align-items: center;
   letter-spacing: 0;        /* 💯 No spacing between letters */
@@ -257,8 +257,10 @@ body {
 /* small tagline under logo if you use it */
 .brand-tagline {
   font-size: 12px;
-  color: var(--muted);
+  color: #000000;     /* nice, premium green */
+  /* or use any green you like here */
 }
+
 
 /* language pill on right */
 .lang-pill {
