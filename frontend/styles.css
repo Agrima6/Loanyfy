@@ -169,16 +169,45 @@ body {
   z-index: 1;
 }
 
-/* Loanyfy Text Logo – slightly animated tracking */
+/* Loanyfy Text Logo – NO GAP between Loan + yfy */
+/* Loanyfy Text Logo – NO GAP and .com in purple */
 .brand-logo-text {
   font-family: "Georgia", "Times New Roman", serif;
   font-weight: 700;
   font-size: 34px;
-  letter-spacing: 0.6px;
-  display: flex;
+  letter-spacing: 0.02em;          /* tiny breathing space */
+  display: inline-flex;
   align-items: baseline;
   position: relative;
 }
+
+.brand-logo-text span {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+/* “Loan” */
+.brand-logo-text .l1 {
+  color: #6a0fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
+  margin-right: 4px;               /* small gap before yfy */
+}
+
+/* “yfy” */
+.brand-logo-text .l2 {
+  color: #30361f;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
+  margin-right: 4px;               /* small gap before .com */
+}
+
+/* “.com” – same purple as Loan */
+.brand-logo-text .l3 {
+  color: #6a0fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
+}
+
+
 
 /* subtle light sweep over text */
 .brand-logo-text::after {
@@ -202,19 +231,6 @@ body {
 .brand:hover .brand-logo-text::after {
   opacity: 1;
   animation: textSweep 1.3s ease-out 1;
-}
-
-/* “Loany” */
-.brand-logo-text .l1 {
-  color: #6a0fff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
-}
-
-/* “fy” */
-.brand-logo-text .l2 {
-  color: #30361f;
-  margin-left: 3px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
 }
 
 /* small tagline under logo if you use it */
@@ -1078,9 +1094,6 @@ input[type="range"]::-moz-range-track {
     padding: 8px 12px;
     margin-top: 10px;
     gap: 8px;
-  }
-
-  .top-bar {
     flex-wrap: wrap;
   }
 

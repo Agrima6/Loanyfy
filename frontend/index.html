@@ -23,7 +23,7 @@
     <div class="brand">
       <div>
         <div class="brand-logo-text">
-          <span class="l1">Loan</span><span class="l2">yfy</span>
+          <span class="l1">Loan</span><span class="l2">yfy</span><span class="l3">.com</span>
         </div>
         <div class="brand-tagline">Loan - Yes For You</div>
       </div>
@@ -84,7 +84,12 @@
 
         <label class="checkbox-row">
           <input type="checkbox" id="termsCheckbox" />
-          <span>I agree to the <a href="#">Terms &amp; Conditions</a></span>
+          <span>
+            I agree to the
+            <a href="privacy.html" target="_blank" rel="noopener noreferrer">
+              Terms &amp; Conditions
+            </a>
+          </span>
         </label>
 
         <button class="primary-btn" id="toStep2Btn">
@@ -92,7 +97,8 @@
         </button>
 
         <p class="support-text">
-          Need help? <a href="#">Contact support</a>
+          Need help?
+          <a href="tel:+9198936070">Contact support: +91 9198936070</a>
         </p>
 
         <p class="security-text">
@@ -250,6 +256,7 @@
           <div class="calculator-card glass">
             <h2 class="calculator-title">EMI Calculator</h2>
 
+            <!-- Loan Amount -->
             <div class="field-group">
               <label>Loan Amount</label>
               <div class="range-row">
@@ -264,6 +271,7 @@
               </div>
             </div>
 
+            <!-- Tenure -->
             <div class="field-group">
               <label>Tenure (Months)</label>
               <div class="range-row">
@@ -278,6 +286,22 @@
               </div>
             </div>
 
+            <!-- Interest Rate -->
+            <div class="field-group">
+              <label>Interest Rate (p.a.)</label>
+              <div class="range-row">
+                <input type="range" id="interestRange" min="10" max="30" step="0.25" />
+                <span id="interestLabel" class="range-value">16.99% p.a.</span>
+              </div>
+
+              <div class="inline-inputs">
+                <span>10%</span>
+                <input type="number" id="interestInput" step="0.01" />
+                <span>30%</span>
+              </div>
+            </div>
+
+            <!-- EMI result -->
             <div class="emi-result">
               <div class="emi-main">
                 <span>Your Monthly EMI</span>
@@ -491,6 +515,5 @@
   </script>
 
   <script src="script.js"></script>
-
 </body>
 </html>

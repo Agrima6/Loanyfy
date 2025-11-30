@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // 🔄 Swap side illustrations for this step
+    // 🔄 Swap side illustrations for this step (if any)
     const sideImgs = document.querySelectorAll(".side-img");
     sideImgs.forEach((img) => {
       const imgStep = Number(img.dataset.step || 0);
@@ -176,6 +176,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const tenureInput = document.getElementById("tenureInput");
   const tenureLabel = document.getElementById("tenureLabel");
 
+  const interestRange = document.getElementById("interestRange");
+  const interestInput = document.getElementById("interestInput");
+  const interestLabel = document.getElementById("interestLabel");
+  const interestRateLabel = document.getElementById("interestRateLabel");
+
   const emiValueEl = document.getElementById("emiValue");
   const totalInterestEl = document.getElementById("totalInterestValue");
   const totalAmountEl = document.getElementById("totalAmountValue");
@@ -213,6 +218,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loanAmountLabel.textContent = formatCurrency(loanAmount);
     tenureLabel.textContent = tenureMonths + " months";
+
+    if (interestLabel) {
+      interestLabel.textContent = interestRate.toFixed(2) + "% p.a.";
+    }
+    if (interestRateLabel) {
+      interestRateLabel.textContent = interestRate.toFixed(2) + "% p.a.";
+    }
+    if (interestInput) {
+      interestInput.value = interestRate.toFixed(2);
+    }
+    if (interestRange) {
+      interestRange.value = interestRate;
+    }
 
     const updateText = (el, value, prefix = "₹ ") => {
       if (!animated || typeof gsap === "undefined") {
@@ -263,11 +281,22 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCalculatorFromState();
   }
 
+  function syncInterest(newVal) {
+    const val = Number(newVal);
+    if (Number.isNaN(val) || val <= 0) return;
+    calcState.interestRate = val;
+    if (interestRange) interestRange.value = val;
+    if (interestInput) interestInput.value = val.toFixed(2);
+    updateCalculatorFromState();
+  }
+
   // initial defaults
   loanAmountRange.value = calcState.loanAmount;
   loanAmountInput.value = calcState.loanAmount;
   tenureRange.value = calcState.tenureMonths;
   tenureInput.value = calcState.tenureMonths;
+  if (interestRange) interestRange.value = calcState.interestRate;
+  if (interestInput) interestInput.value = calcState.interestRate.toFixed(2);
   updateCalculatorFromState(false);
 
   loanAmountRange.addEventListener("input", (e) =>
@@ -278,6 +307,17 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   tenureRange.addEventListener("input", (e) => syncTenure(e.target.value));
   tenureInput.addEventListener("change", (e) => syncTenure(e.target.value));
+
+  if (interestRange) {
+    interestRange.addEventListener("input", (e) =>
+      syncInterest(e.target.value)
+    );
+  }
+  if (interestInput) {
+    interestInput.addEventListener("change", (e) =>
+      syncInterest(e.target.value)
+    );
+  }
 
   // ------------------ STEP 3 -> STEP 4 ------------------
   async function handleProcessClick(productType) {
