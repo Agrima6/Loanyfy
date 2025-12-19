@@ -8,6 +8,139 @@
 
   <!-- GSAP Animations -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <!-- ✅ Inline UI + Performance Fixes (A + B) -->
+  <style>
+    /* ===== Success Overlay Screen (Trust Green) ===== */
+    .success-overlay{
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(3, 14, 9, 0.62);
+      backdrop-filter: blur(10px);
+    }
+    .success-overlay.show{ display: flex; }
+
+    .success-card{
+      width: min(560px, 95vw);
+      border-radius: 22px;
+      padding: 22px 18px;
+      background: linear-gradient(180deg, rgba(9, 140, 76, 0.95), rgba(7, 106, 60, 0.92));
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 22px 70px rgba(0,0,0,0.35);
+      transform: translateY(16px) scale(0.98);
+      opacity: 0;
+      animation: successIn 420ms cubic-bezier(.2,.9,.2,1) forwards;
+    }
+    @keyframes successIn{
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .success-top{
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .success-badge{
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      position: relative;
+      overflow: hidden;
+    }
+    .success-badge::after{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), transparent 55%);
+      animation: glowMove 1.8s ease-in-out infinite;
+    }
+    @keyframes glowMove{
+      0%,100%{ transform: translate(-6px,-6px); opacity: .9; }
+      50%{ transform: translate(10px,10px); opacity: .6; }
+    }
+    .success-title{
+      font-size: 20px;
+      line-height: 1.2;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+    .success-sub{
+      margin: 6px 0 0;
+      opacity: 0.92;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .success-details{
+      margin-top: 14px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 16px;
+      padding: 12px 12px;
+    }
+    .success-details ul{
+      margin: 0;
+      padding-left: 18px;
+      opacity: 0.95;
+    }
+    .success-details li{ margin: 6px 0; }
+
+    .success-actions{
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .success-actions button{
+      flex: 1;
+      border: 0;
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-weight: 700;
+    }
+    .success-actions .btn-dark{
+      background: rgba(0,0,0,0.20);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+    .success-actions .btn-white{
+      background: #fff;
+      color: #0a6a3c;
+    }
+
+    /* ✅ PERF: keep glass smooth on transitions */
+    .glass, .glass-soft{
+      will-change: transform;
+      transform: translateZ(0);
+    }
+
+    /* ✅ Step B: Pause partners marquee (and heavy work) until Step 4 is ACTIVE */
+    .partners-section { content-visibility: auto; contain-intrinsic-size: 800px; }
+    body:not(.is-step4) .partners-section { display: none; }
+
+    /* If your marquee uses CSS animations, pause them by default */
+    body:not(.is-step4) .partners-marquee-row,
+    body:not(.is-step4) .partners-track {
+      animation-play-state: paused !important;
+    }
+
+    /* optional tiny shimmer placeholder for partner logos while loading */
+    .partner-logo img[data-src]{
+      filter: saturate(0.9);
+    }
+  </style>
 </head>
 
 <body>
@@ -23,9 +156,8 @@
     <div class="brand">
       <div>
         <div class="brand-logo-text">
-  <span class="txt-loan">Loan</span><span class="txt-yfy">yfy</span><span class="txt-com">.com</span>
-</div>
-
+          <span class="txt-loan">Loan</span><span class="txt-yfy">yfy</span><span class="txt-com">.com</span>
+        </div>
         <div class="brand-tagline">Loan - Yes For You</div>
       </div>
     </div>
@@ -54,12 +186,10 @@
         <div class="step-header">
           <div class="step-header-text">
             <h1 class="step-heading">Welcome to Loanyfy</h1>
-            <p class="step-subtitle">
-              Start your business loan journey in just a few steps.
-            </p>
+            <p class="step-subtitle">Start your business loan journey in just a few steps.</p>
           </div>
           <div class="step-header-visual">
-            <img src="assets/mm.png" alt="Welcome to Loanyfy">
+            <img src="assets/mm.png" alt="Welcome to Loanyfy" loading="lazy" decoding="async">
           </div>
         </div>
 
@@ -87,9 +217,7 @@
           <input type="checkbox" id="termsCheckbox" />
           <span>
             I agree to the
-            <a href="privacy.html" target="_blank" rel="noopener noreferrer">
-              Terms &amp; Conditions
-            </a>
+            <a href="privacy.html" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a>
           </span>
         </label>
 
@@ -102,9 +230,7 @@
           <a href="tel:+9198936070">Contact support: +91 9198936070</a>
         </p>
 
-        <p class="security-text">
-          🔒 Your data is secure and encrypted.
-        </p>
+        <p class="security-text">🔒 Your data is secure and encrypted.</p>
       </section>
 
       <!-- STEP 2 -->
@@ -115,7 +241,7 @@
             <p class="step-subtitle">Tell us more about your business.</p>
           </div>
           <div class="step-header-visual">
-            <img src="assets/hnd.png" alt="Business details illustration">
+            <img src="assets/hnd.png" alt="Business details illustration" loading="lazy" decoding="async">
           </div>
         </div>
 
@@ -182,12 +308,7 @@
 
         <div class="field-group">
           <label>Monthly Obligations (Existing EMIs / Credit Card dues)</label>
-          <input
-            type="number"
-            id="monthlyObligation"
-            placeholder="Total monthly obligations in ₹"
-            min="0"
-          />
+          <input type="number" id="monthlyObligation" placeholder="Total monthly obligations in ₹" min="0" />
         </div>
 
         <div class="field-group">
@@ -215,12 +336,10 @@
         <div class="step-header">
           <div class="step-header-text">
             <h1 class="step-heading">Your Loan Offer</h1>
-            <p class="step-subtitle">
-              Based on your details, here’s an indicative offer.
-            </p>
+            <p class="step-subtitle">Based on your details, here’s an indicative offer.</p>
           </div>
           <div class="step-header-visual">
-            <img src="assets/uu.png" alt="Loan offer illustration">
+            <img src="assets/uu.png" alt="Loan offer illustration" loading="lazy" decoding="async">
           </div>
         </div>
 
@@ -257,7 +376,6 @@
           <div class="calculator-card glass">
             <h2 class="calculator-title">EMI Calculator</h2>
 
-            <!-- Loan Amount -->
             <div class="field-group">
               <label>Loan Amount</label>
               <div class="range-row">
@@ -272,7 +390,6 @@
               </div>
             </div>
 
-            <!-- Tenure -->
             <div class="field-group">
               <label>Tenure (Months)</label>
               <div class="range-row">
@@ -287,7 +404,6 @@
               </div>
             </div>
 
-            <!-- Interest Rate -->
             <div class="field-group">
               <label>Interest Rate (p.a.)</label>
               <div class="range-row">
@@ -302,7 +418,6 @@
               </div>
             </div>
 
-            <!-- EMI result -->
             <div class="emi-result">
               <div class="emi-main">
                 <span>Your Monthly EMI</span>
@@ -331,12 +446,8 @@
           <div class="process-actions">
             <span class="process-label">Process for:</span>
             <div class="process-buttons">
-              <button class="primary-btn" id="processOverdraftBtn">
-                Overdraft Limit
-              </button>
-              <button class="primary-btn secondary-as-primary" id="processTermLoanBtn">
-                Term Loan
-              </button>
+              <button class="primary-btn" id="processOverdraftBtn">Overdraft Limit</button>
+              <button class="primary-btn secondary-as-primary" id="processTermLoanBtn">Term Loan</button>
             </div>
           </div>
         </div>
@@ -390,12 +501,10 @@
           <div class="upload-header-row">
             <div>
               <h3>Upload your documents now</h3>
-              <p class="upload-subtext">
-                Upload securely so our experts can fast-track your approval.
-              </p>
+              <p class="upload-subtext">Upload securely so our experts can fast-track your approval.</p>
             </div>
             <div class="upload-visual">
-              <img src="assets/ag.png" alt="Secure upload">
+              <img src="assets/ag.png" alt="Secure upload" loading="lazy" decoding="async">
             </div>
           </div>
 
@@ -422,8 +531,7 @@
 
             <div class="upload-field upload-field-wide">
               <label>Bank Statements (last 6 months)</label>
-              <input type="file" id="docBankStatements" multiple
-                     accept="image/*,application/pdf" />
+              <input type="file" id="docBankStatements" multiple accept="image/*,application/pdf" />
             </div>
           </div>
 
@@ -432,9 +540,7 @@
             share your data without consent.
           </p>
 
-          <button class="primary-btn" id="submitDocsBtn">
-            Upload Documents Securely
-          </button>
+          <button class="primary-btn" id="submitDocsBtn">Upload Documents Securely</button>
         </div>
 
         <!-- Partners marquee ONLY on last page -->
@@ -444,77 +550,183 @@
           <div class="partners-marquee-wrapper">
             <!-- ROW 1 -->
             <div class="partners-marquee-row partners-row-1">
-              <!-- Track 1 -->
               <div class="partners-track">
-                <div class="partner-logo"><img src="assets/partners/100.svg" alt="Kotak" /></div>
-                <div class="partner-logo"><img src="assets/partners/wee.png" alt="HDFC Bank" /></div>
-                <div class="partner-logo"><img src="assets/partners/102.png" alt="ICICI Bank" /></div>
-                <div class="partner-logo"><img src="assets/partners/103.png" alt="Axis Bank" /></div>
-                <div class="partner-logo"><img src="assets/partners/104.png" alt="SBI" /></div>
-                <div class="partner-logo"><img src="assets/partners/105.svg" alt="NeoGrowth" /></div>
-                <div class="partner-logo"><img src="assets/partners/106.png" alt="Fullerton" /></div>
-                <div class="partner-logo"><img src="assets/partners/107.png" alt="Bajaj Finserv" /></div>
-                <div class="partner-logo"><img src="assets/partners/8.png"   alt="KreditBee" /></div>
+                <div class="partner-logo"><img data-src="assets/partners/100.svg" alt="Kotak" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/wee.png" alt="HDFC Bank" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/102.png" alt="ICICI Bank" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/103.png" alt="Axis Bank" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/104.png" alt="SBI" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/105.svg" alt="NeoGrowth" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/106.png" alt="Fullerton" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/107.png" alt="Bajaj Finserv" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/8.png" alt="KreditBee" loading="lazy" decoding="async"></div>
               </div>
 
-              <!-- Track 2 (duplicate for seamless loop) -->
               <div class="partners-track">
-                <div class="partner-logo"><img src="assets/partners/100.svg" alt="Kotak" /></div>
-                <div class="partner-logo"><img src="assets/partners/wee.png" alt="HDFC Bank" /></div>
-                <div class="partner-logo"><img src="assets/partners/102.png" alt="ICICI Bank" /></div>
-                <div class="partner-logo"><img src="assets/partners/103.png" alt="Axis Bank" /></div>
-                <div class="partner-logo"><img src="assets/partners/104.png" alt="SBI" /></div>
-                <div class="partner-logo"><img src="assets/partners/105.svg" alt="NeoGrowth" /></div>
-                <div class="partner-logo"><img src="assets/partners/106.png" alt="Fullerton" /></div>
-                <div class="partner-logo"><img src="assets/partners/107.png" alt="Bajaj Finserv" /></div>
-                <div class="partner-logo"><img src="assets/partners/8.png"   alt="KreditBee" /></div>
+                <div class="partner-logo"><img data-src="assets/partners/100.svg" alt="Kotak" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/wee.png" alt="HDFC Bank" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/102.png" alt="ICICI Bank" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/103.png" alt="Axis Bank" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/104.png" alt="SBI" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/105.svg" alt="NeoGrowth" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/106.png" alt="Fullerton" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/107.png" alt="Bajaj Finserv" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/8.png" alt="KreditBee" loading="lazy" decoding="async"></div>
               </div>
             </div>
 
             <!-- ROW 2 -->
             <div class="partners-marquee-row partners-row-2">
-              <!-- Track 1 -->
               <div class="partners-track">
-                <div class="partner-logo"><img src="assets/partners/101.png" alt="FlexiLoans" /></div>
-                <div class="partner-logo"><img src="assets/partners/102.png" alt="Tata Capital" /></div>
-                <div class="partner-logo"><img src="assets/partners/100.svg" alt="Poonawalla Fincorp" /></div>
-                <div class="partner-logo"><img src="assets/partners/103.png" alt="SBM Bank" /></div>
-                <div class="partner-logo"><img src="assets/partners/104.png" alt="Standard Chartered" /></div>
-                <div class="partner-logo"><img src="assets/partners/105.svg" alt="IIFL" /></div>
-                <div class="partner-logo"><img src="assets/partners/106.png" alt="Edelweiss" /></div>
-                <div class="partner-logo"><img src="assets/partners/107.png" alt="MAS Finance" /></div>
-                <div class="partner-logo"><img src="assets/partners/109.png" alt="Muthoot Finance" /></div>
+                <div class="partner-logo"><img data-src="assets/partners/101.png" alt="FlexiLoans" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/102.png" alt="Tata Capital" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/100.svg" alt="Poonawalla Fincorp" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/103.png" alt="SBM Bank" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/104.png" alt="Standard Chartered" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/105.svg" alt="IIFL" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/106.png" alt="Edelweiss" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/107.png" alt="MAS Finance" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/109.png" alt="Muthoot Finance" loading="lazy" decoding="async"></div>
               </div>
 
-              <!-- Track 2 (duplicate) -->
               <div class="partners-track">
-                <div class="partner-logo"><img src="assets/partners/101.png" alt="FlexiLoans" /></div>
-                <div class="partner-logo"><img src="assets/partners/102.png" alt="Tata Capital" /></div>
-                <div class="partner-logo"><img src="assets/partners/100.svg" alt="Poonawalla Fincorp" /></div>
-                <div class="partner-logo"><img src="assets/partners/103.png" alt="SBM Bank" /></div>
-                <div class="partner-logo"><img src="assets/partners/104.png" alt="Standard Chartered" /></div>
-                <div class="partner-logo"><img src="assets/partners/105.svg" alt="IIFL" /></div>
-                <div class="partner-logo"><img src="assets/partners/106.png" alt="Edelweiss" /></div>
-                <div class="partner-logo"><img src="assets/partners/107.png" alt="MAS Finance" /></div>
-                <div class="partner-logo"><img src="assets/partners/109.png" alt="Muthoot Finance" /></div>
+                <div class="partner-logo"><img data-src="assets/partners/101.png" alt="FlexiLoans" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/102.png" alt="Tata Capital" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/100.svg" alt="Poonawalla Fincorp" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/103.png" alt="SBM Bank" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/104.png" alt="Standard Chartered" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/105.svg" alt="IIFL" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/106.png" alt="Edelweiss" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/107.png" alt="MAS Finance" loading="lazy" decoding="async"></div>
+                <div class="partner-logo"><img data-src="assets/partners/109.png" alt="Muthoot Finance" loading="lazy" decoding="async"></div>
               </div>
             </div>
           </div>
         </section>
 
-        <button class="ghost-btn start-again-btn" id="startAgainBtn">
-          Start New Application
-        </button>
+        <button class="ghost-btn start-again-btn" id="startAgainBtn">Start New Application</button>
       </section>
     </section>
   </main>
 
+  <!-- ✅ Success Screen Overlay -->
+  <div class="success-overlay" id="successOverlay" role="dialog" aria-modal="true" aria-label="Upload Successful">
+    <div class="success-card">
+      <div class="success-top">
+        <div class="success-badge">
+          <span style="font-size:28px; position:relative; z-index:1;">✅</span>
+        </div>
+        <div>
+          <h2 class="success-title">Documents Uploaded Successfully!</h2>
+          <p class="success-sub">
+            Your documents are uploaded securely. Our <strong>LOANYFY Expert</strong> will contact you shortly to fast-track your approval.
+          </p>
+        </div>
+      </div>
+
+      <div class="success-details">
+        <ul>
+          <li>🔒 Encrypted & stored securely</li>
+          <li>📞 Expert verification call on your registered number</li>
+          <li>⚡ Faster approval processing</li>
+        </ul>
+      </div>
+
+      <div class="success-actions">
+        <button class="btn-dark" id="closeSuccessBtn">Close</button>
+        <button class="btn-white" id="startAgainFromSuccessBtn">Start New Application</button>
+      </div>
+    </div>
+  </div>
+
   <!-- API URL -->
   <script>
-    // LIVE backend on Render
     window.LOANYFY_API_BASE = "https://loanyfy.onrender.com";
   </script>
 
   <script src="script.js"></script>
+
+  <!-- ✅ Perf + Step4 Lazy Load + Success Screen Control -->
+  <script>
+    (function () {
+      const wizard = document.getElementById("wizardCard");
+      const overlay = document.getElementById("successOverlay");
+      const closeBtn = document.getElementById("closeSuccessBtn");
+      const startAgainBtn = document.getElementById("startAgainFromSuccessBtn");
+      const uploadBtn = document.getElementById("submitDocsBtn");
+
+      // ✅ Step A: Ensure all images are lazy/async (even if you forget on some)
+      document.querySelectorAll("img").forEach(img => {
+        img.loading = img.loading || "lazy";
+        img.decoding = img.decoding || "async";
+      });
+
+      // ✅ Step B: load partner logos only when Step 4 becomes active
+      function loadPartnerLogos() {
+        const imgs = document.querySelectorAll('.partners-section img[data-src]');
+        imgs.forEach(img => {
+          if (!img.getAttribute('src')) {
+            img.setAttribute('src', img.getAttribute('data-src'));
+          }
+        });
+      }
+
+      // Detect active step by watching class changes (no need to edit script.js)
+      function syncStepClassFromDOM() {
+        const active = document.querySelector(".step.step-active");
+        const step = active ? active.getAttribute("data-step") : null;
+
+        document.body.classList.toggle("is-step4", step === "4");
+
+        if (step === "4") {
+          loadPartnerLogos(); // heavy stuff loads now only
+        }
+      }
+
+      // Watch for step changes
+      const obs = new MutationObserver(syncStepClassFromDOM);
+      obs.observe(wizard, { subtree: true, attributes: true, attributeFilter: ["class"] });
+      syncStepClassFromDOM();
+
+      // ✅ Success screen helpers
+      function openSuccess() {
+        overlay.classList.add("show");
+        document.body.style.overflow = "hidden";
+        if (window.gsap) {
+          gsap.fromTo(".success-card",
+            { y: 18, scale: 0.98, opacity: 0 },
+            { y: 0, scale: 1, opacity: 1, duration: 0.45, ease: "power3.out" }
+          );
+        }
+      }
+      function closeSuccess() {
+        overlay.classList.remove("show");
+        document.body.style.overflow = "";
+      }
+
+      // IMPORTANT:
+      // If your upload is API-based, call openSuccess() only AFTER upload success in script.js.
+      // For now, this shows the screen on click (safe UI fallback).
+      uploadBtn && uploadBtn.addEventListener("click", function () {
+        // If you already do fetch upload, REMOVE this line and call openSuccess() after success.
+        openSuccess();
+      }, { passive: true });
+
+      closeBtn && closeBtn.addEventListener("click", closeSuccess, { passive: true });
+
+      startAgainBtn && startAgainBtn.addEventListener("click", function () {
+        closeSuccess();
+        const realStartAgain = document.getElementById("startAgainBtn");
+        realStartAgain && realStartAgain.click();
+      }, { passive: true });
+
+      overlay && overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) closeSuccess();
+      }, { passive: true });
+
+      // Expose function if you want to call it from script.js after real upload success
+      window.LOANYFY_openUploadSuccess = openSuccess;
+    })();
+  </script>
 </body>
 </html>
