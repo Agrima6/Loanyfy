@@ -6,13 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentStep = 1;
 
   // ------------------ STATE ------------------
-  let basic = {
-    fullName: "",
-    mobile: "",
-    email: "",
-    panNumber: "",
-  };
-
+  let basic = { fullName: "", mobile: "", email: "", panNumber: "" };
   let business = {};
   let calcState = {
     loanAmount: 500000,
@@ -25,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let applicationId = null;
 
-  // prevent double-click + double network calls
   let isProcessingApplication = false;
   let isUploadingDocs = false;
 
@@ -44,11 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // ✅ Step B support: only step4 heavy stuff
+    // for partners lazy load logic from index.html
     document.body.classList.toggle("is-step4", step === 4);
 
-    const pct = (step / 4) * 100;
-    progressFill.style.width = pct + "%";
+    progressFill.style.width = (step / 4) * 100 + "%";
 
     const labels = {
       1: "Step 1 of 4 – Welcome",
@@ -58,15 +50,9 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     stepTitleEl.textContent = labels[step];
 
-    // Card + icon animation
-    const activeSection = steps.find(
-      (s) => parseInt(s.dataset.step, 10) === step
-    );
-
+    const activeSection = steps.find((s) => parseInt(s.dataset.step, 10) === step);
     if (activeSection && typeof gsap !== "undefined") {
-      // kill old anim on this node to avoid stacking
       gsap.killTweensOf(activeSection);
-
       gsap.fromTo(
         activeSection,
         { opacity: 0, y: 26 },
@@ -83,13 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       }
     }
-
-    // 🔄 Swap side illustrations for this step (if any)
-    const sideImgs = document.querySelectorAll(".side-img");
-    sideImgs.forEach((img) => {
-      const imgStep = Number(img.dataset.step || 0);
-      img.classList.toggle("side-img-active", imgStep === step);
-    });
   }
 
   // ------------------ STEP 1 ------------------
@@ -130,8 +109,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return alert("Please fill all required business details.");
     }
 
-    const monthlyObligation = monthlyObligationRaw ? Number(monthlyObligationRaw) : 0;
-
     business = {
       tradeName,
       vintage,
@@ -142,13 +119,13 @@ document.addEventListener("DOMContentLoaded", () => {
       constitutionType,
       annualTurnover,
       industryType,
-      monthlyObligation,
+      monthlyObligation: monthlyObligationRaw ? Number(monthlyObligationRaw) : 0,
     };
 
     showStep(3);
   });
 
-  // ------------------ CALCULATOR (STEP 3) ------------------
+  // ------------------ CALCULATOR ------------------
   const loanAmountRange = document.getElementById("loanAmountRange");
   const loanAmountInput = document.getElementById("loanAmountInput");
   const loanAmountLabel = document.getElementById("loanAmountLabel");
@@ -181,7 +158,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return { emi, totalInterest, totalAmount };
   }
 
-  // ✅ Debounce calculator updates to avoid 100 GSAP tweens per second
   let calcRAF = 0;
   function scheduleCalculatorUpdate(animated = true) {
     if (calcRAF) cancelAnimationFrame(calcRAF);
@@ -209,12 +185,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const updateText = (el, value, prefix = "₹ ") => {
       if (!el) return;
-
-      // ✅ kill previous tween on this element so they don't stack
       if (typeof gsap !== "undefined") gsap.killTweensOf(el);
 
       if (!animated || typeof gsap === "undefined") {
-        el.textContent = prefix + Math.round(value).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+        el.textContent = prefix + Math.round(value).toLocaleString("en-IN");
         return;
       }
 
@@ -227,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
         duration: 0.35,
         ease: "power2.out",
         onUpdate: () => {
-          el.textContent = prefix + Math.round(obj.val).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+          el.textContent = prefix + Math.round(obj.val).toLocaleString("en-IN");
         },
       });
     };
@@ -264,7 +238,6 @@ document.addEventListener("DOMContentLoaded", () => {
     scheduleCalculatorUpdate(true);
   }
 
-  // initial defaults
   loanAmountRange.value = calcState.loanAmount;
   loanAmountInput.value = calcState.loanAmount;
   tenureRange.value = calcState.tenureMonths;
@@ -277,30 +250,18 @@ document.addEventListener("DOMContentLoaded", () => {
   loanAmountInput.addEventListener("change", (e) => syncLoanAmount(e.target.value));
   tenureRange.addEventListener("input", (e) => syncTenure(e.target.value), { passive: true });
   tenureInput.addEventListener("change", (e) => syncTenure(e.target.value));
-
   if (interestRange) interestRange.addEventListener("input", (e) => syncInterest(e.target.value), { passive: true });
   if (interestInput) interestInput.addEventListener("change", (e) => syncInterest(e.target.value));
 
-  // ------------------ STEP 3 -> STEP 4 ------------------
-  const overdraftBtn = document.getElementById("processOverdraftBtn");
-  const termLoanBtn = document.getElementById("processTermLoanBtn");
+  // ------------------ PREWARM RENDER (optional but helps) ------------------
+  (function prewarm() {
+    const base = window.LOANYFY_API_BASE || "";
+    fetch(base + "/health").catch(() => {});
+  })();
 
-  function setProcessButtonsLoading(isLoading) {
-    const btns = [overdraftBtn, termLoanBtn].filter(Boolean);
-    btns.forEach((b) => {
-      b.disabled = isLoading;
-      b.style.opacity = isLoading ? "0.7" : "1";
-      b.style.pointerEvents = isLoading ? "none" : "auto";
-    });
-
-    if (overdraftBtn) overdraftBtn.textContent = isLoading ? "Processing..." : "Overdraft Limit";
-    if (termLoanBtn) termLoanBtn.textContent = isLoading ? "Processing..." : "Term Loan";
-  }
-
-  async function handleProcessClick(productType) {
-    if (isProcessingApplication) return; // ✅ prevent double click
-    isProcessingApplication = true;
-    setProcessButtonsLoading(true);
+  // ------------------ CREATE APPLICATION HELPER ------------------
+  async function createApplication(productType) {
+    const base = window.LOANYFY_API_BASE || "";
 
     const payload = {
       fullName: basic.fullName,
@@ -319,41 +280,62 @@ document.addEventListener("DOMContentLoaded", () => {
       },
     };
 
-    try {
-      const base = window.LOANYFY_API_BASE || "";
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 12000); // ✅ avoid long hang
+    const res = await fetch(base + "/api/applications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-      const res = await fetch(base + "/api/applications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      }).finally(() => clearTimeout(timeout));
+    if (!res.ok) throw new Error("Create application failed");
+    const data = await res.json().catch(() => null);
+    applicationId = data?.applicationId || data?.id || applicationId;
+    return applicationId;
+  }
 
-      if (res.ok) {
-        const data = await res.json().catch(() => null);
-        if (data && data.applicationId) applicationId = data.applicationId;
-      } else {
-        console.error("Error saving application:", res.status);
-      }
-    } catch (err) {
-      console.error(err);
-      // keep flow smooth; don't block the user
-    } finally {
-      thankYouNameEl.textContent = basic.fullName || "there";
-      showStep(4);
-      playConfetti();
+  async function ensureApplicationId(productTypeForCreate = "Business Loan") {
+    if (applicationId) return applicationId;
+    return await createApplication(productTypeForCreate);
+  }
 
-      isProcessingApplication = false;
-      setProcessButtonsLoading(false);
-    }
+  // ------------------ STEP 3 -> STEP 4 (INSTANT) ------------------
+  const overdraftBtn = document.getElementById("processOverdraftBtn");
+  const termLoanBtn = document.getElementById("processTermLoanBtn");
+
+  function setProcessButtonsLoading(isLoading) {
+    const btns = [overdraftBtn, termLoanBtn].filter(Boolean);
+    btns.forEach((b) => {
+      b.disabled = isLoading;
+      b.style.opacity = isLoading ? "0.7" : "1";
+      b.style.pointerEvents = isLoading ? "none" : "auto";
+    });
+
+    if (overdraftBtn) overdraftBtn.textContent = isLoading ? "Processing..." : "Overdraft Limit";
+    if (termLoanBtn) termLoanBtn.textContent = isLoading ? "Processing..." : "Term Loan";
+  }
+
+  async function handleProcessClick(productType) {
+    if (isProcessingApplication) return;
+    isProcessingApplication = true;
+    setProcessButtonsLoading(true);
+
+    // ✅ move forward instantly (no 20 sec wait)
+    thankYouNameEl.textContent = basic.fullName || "there";
+    showStep(4);
+    playConfetti();
+
+    // ✅ create application in background
+    createApplication(productType)
+      .catch((e) => console.error("Background create failed:", e))
+      .finally(() => {
+        isProcessingApplication = false;
+        setProcessButtonsLoading(false);
+      });
   }
 
   if (overdraftBtn) overdraftBtn.addEventListener("click", () => handleProcessClick("Overdraft Limit"));
   if (termLoanBtn) termLoanBtn.addEventListener("click", () => handleProcessClick("Term Loan"));
 
-  // ------------------ STEP 4: DOC UPLOAD + RESTART ------------------
+  // ------------------ STEP 4: DOC UPLOAD ------------------
   const submitDocsBtn = document.getElementById("submitDocsBtn");
   const startAgainBtn = document.getElementById("startAgainBtn");
 
@@ -375,53 +357,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const base = window.LOANYFY_API_BASE || "";
 
-      if (!applicationId) {
-        const confirmProceed = confirm("Application ID not found yet. Upload documents anyway?");
-        if (!confirmProceed) {
-          isUploadingDocs = false;
-          setUploadLoading(false);
-          return;
-        }
-      }
-
-      const formData = new FormData();
-      if (applicationId) formData.append("applicationId", applicationId);
-
-      const docPan = document.getElementById("docPan")?.files?.[0];
-      const docAadhaar = document.getElementById("docAadhaar")?.files?.[0];
-      const docBusinessReg = document.getElementById("docBusinessReg")?.files?.[0];
-      const docElectricity = document.getElementById("docElectricityBill")?.files?.[0];
-      const bankFiles = Array.from(document.getElementById("docBankStatements")?.files || []);
-
-      if (docPan) formData.append("pan", docPan);
-      if (docAadhaar) formData.append("aadhaar", docAadhaar);
-      if (docBusinessReg) formData.append("businessReg", docBusinessReg);
-      if (docElectricity) formData.append("electricityBill", docElectricity);
-      bankFiles.forEach((file, idx) => formData.append("bankStatements", file, file.name || `bank_${idx}`));
-
       try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 20000);
+        // ✅ guarantee applicationId exists
+        await ensureApplicationId("Business Loan");
+
+        const formData = new FormData();
+        formData.append("applicationId", applicationId);
+
+        const docPan = document.getElementById("docPan")?.files?.[0];
+        const docAadhaar = document.getElementById("docAadhaar")?.files?.[0];
+        const docBusinessReg = document.getElementById("docBusinessReg")?.files?.[0];
+        const docElectricity = document.getElementById("docElectricityBill")?.files?.[0];
+        const bankFiles = Array.from(document.getElementById("docBankStatements")?.files || []);
+
+        if (docPan) formData.append("pan", docPan);
+        if (docAadhaar) formData.append("aadhaar", docAadhaar);
+        if (docBusinessReg) formData.append("businessReg", docBusinessReg);
+        if (docElectricity) formData.append("electricityBill", docElectricity);
+        bankFiles.forEach((file) => formData.append("bankStatements", file));
 
         const res = await fetch(base + "/api/applications/upload-docs", {
           method: "POST",
           body: formData,
-          signal: controller.signal,
-        }).finally(() => clearTimeout(timeout));
+        });
 
         if (res.ok) {
-          // ✅ show your green trustworthy screen (from updated index.html)
+          // ✅ show green success screen only on true success
           if (typeof window.LOANYFY_openUploadSuccess === "function") {
             window.LOANYFY_openUploadSuccess();
           } else {
             alert("Documents uploaded securely. Thank you!");
           }
         } else {
+          const errText = await res.text().catch(() => "");
+          console.error("Upload failed:", res.status, errText);
           alert("There was an issue uploading your documents. Please try again.");
         }
       } catch (err) {
         console.error(err);
-        alert("We could not upload your documents right now. Please try again in some time.");
+        alert("We could not upload right now. Please try again in some time.");
       } finally {
         isUploadingDocs = false;
         setUploadLoading(false);
@@ -437,51 +411,19 @@ document.addEventListener("DOMContentLoaded", () => {
     gsap.fromTo(
       pieces,
       { y: -20, opacity: 0, scale: 0.7, rotation: -20 },
-      {
-        y: 40,
-        opacity: 1,
-        scale: 1,
-        rotation: 20,
-        duration: 0.8,
-        ease: "power3.out",
-        stagger: 0.10,
-      }
+      { y: 40, opacity: 1, scale: 1, rotation: 20, duration: 0.8, ease: "power3.out", stagger: 0.1 }
     );
 
     gsap.killTweensOf("#thankYouName");
-    gsap.fromTo(
-      "#thankYouName",
-      { scale: 0.95 },
-      { scale: 1.05, duration: 0.45, ease: "back.out(2)" }
-    );
+    gsap.fromTo("#thankYouName", { scale: 0.95 }, { scale: 1.05, duration: 0.45, ease: "back.out(2)" });
   }
 
   // ------------------ GLOBAL ANIMATIONS ------------------
   function initGlobalAnimations() {
     if (typeof gsap === "undefined") return;
 
-    gsap.from(".card", {
-      y: 24,
-      opacity: 0,
-      duration: 0.6,
-      ease: "power2.out",
-    });
+    gsap.from(".card", { y: 24, opacity: 0, duration: 0.6, ease: "power2.out" });
 
-    // NOTE: your HTML has brand-logo-text, not .brand-logo
-    // so this tween does nothing. Keeping safe:
-    const brandLogo = document.querySelector(".brand-logo");
-    if (brandLogo) {
-      gsap.to(brandLogo, {
-        y: -4,
-        repeat: -1,
-        yoyo: true,
-        duration: 2,
-        ease: "sine.inOut",
-      });
-    }
-
-    // ⚠️ Animating ALL primary buttons forever can be heavy on low-end phones.
-    // Keeping it but lighter:
     gsap.to(".primary-btn", {
       y: -2,
       repeat: -1,
@@ -491,25 +433,9 @@ document.addEventListener("DOMContentLoaded", () => {
       stagger: 0.25,
     });
 
-    gsap.from(".blob", {
-      opacity: 0,
-      duration: 1.1,
-      stagger: 0.12,
-    });
-
-    const side = document.querySelector(".side-illustration");
-    if (side) {
-      gsap.to(side, {
-        y: -12,
-        duration: 6,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      });
-    }
+    gsap.from(".blob", { opacity: 0, duration: 1.1, stagger: 0.12 });
   }
 
-  // init animations + first step
   initGlobalAnimations();
   showStep(1);
 });
