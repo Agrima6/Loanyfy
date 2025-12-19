@@ -103,10 +103,21 @@ const storage = multer.diskStorage({
     cb(null, `${unique}-${safeOriginal}`);
   },
 });
-const upload = multer({ storage });
+
+// ✅ IMPORTANT: increase limits (bank statements PDFs can be big)
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 15 * 1024 * 1024, // 15MB per file
+    files: 30, // total files safety
+  },
+});
 
 // ---------- ROUTES ----------
 app.get("/", (req, res) => res.send("Loanyfy API is running 🚀"));
+
+// ✅ optional health endpoint (helps pre-warm on Render)
+app.get("/health", (req, res) => res.json({ ok: true }));
 
 app.post("/api/applications", async (req, res) => {
   try {
@@ -133,22 +144,40 @@ app.post(
   ]),
   async (req, res) => {
     try {
-      const { applicationId } = req.body;
+      let { applicationId } = req.body;
+
+      // ✅ If applicationId missing, we try to create a minimal application automatically
+      // (so upload doesn't fail if user clicks upload quickly due to backend cold start)
       if (!applicationId) {
-        return res.status(400).json({
-          success: false,
-          message: "applicationId is required to attach documents",
+        const fullName = req.body.fullName || "Unknown";
+        const mobile = req.body.mobile || "0000000000";
+
+        const created = await Application.create({
+          fullName,
+          mobile,
+          email: req.body.email,
+          panNumber: req.body.panNumber,
+          productType: req.body.productType || "Business Loan",
+          business: req.body.business || {},
+          calculator: req.body.calculator || {},
         });
+
+        applicationId = created._id.toString();
       }
 
       const files = req.files || {};
 
       // ✅ FULL BASE URL (so Netlify can open images from Render)
-      const baseUrl = process.env.PUBLIC_BASE_URL || `${req.protocol}://${req.get("host")}`;
+      const baseUrl =
+        process.env.PUBLIC_BASE_URL || `${req.protocol}://${req.get("host")}`;
 
       const docsUpdate = {
-        pan: files.pan?.[0] ? `${baseUrl}/uploads/${files.pan[0].filename}` : undefined,
-        aadhaar: files.aadhaar?.[0] ? `${baseUrl}/uploads/${files.aadhaar[0].filename}` : undefined,
+        pan: files.pan?.[0]
+          ? `${baseUrl}/uploads/${files.pan[0].filename}`
+          : undefined,
+        aadhaar: files.aadhaar?.[0]
+          ? `${baseUrl}/uploads/${files.aadhaar[0].filename}`
+          : undefined,
         businessReg: files.businessReg?.[0]
           ? `${baseUrl}/uploads/${files.businessReg[0].filename}`
           : undefined,
@@ -185,13 +214,36 @@ app.post(
         });
       }
 
-      res.json({ success: true, message: "Documents uploaded & linked ✅" });
+      res.json({
+        success: true,
+        message: "Documents uploaded & linked ✅",
+        applicationId,
+      });
     } catch (err) {
       console.error("Upload docs error ❌", err);
-      res.status(500).json({ success: false, message: "Server error" });
+      res.status(500).json({ success: false, message: err.message || "Server error" });
     }
   }
 );
+
+// ✅ Multer/Upload error handler (VERY IMPORTANT)
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    // e.g. LIMIT_FILE_SIZE
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+      code: err.code,
+    });
+  }
+  if (err) {
+    return res.status(500).json({
+      success: false,
+      message: err.message || "Server error",
+    });
+  }
+  next();
+});
 
 // ---------- START SERVER ----------
 const PORT = process.env.PORT || 5001;
